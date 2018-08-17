@@ -515,8 +515,6 @@ int editorReadKey() {
 }
 
 int getWindowSize(int* screen_rows, int* screen_cols) {
-    struct winsize ws;
-
     // Fixed window size (VT100)
     *screen_cols = 80;
     *screen_rows = 24;
@@ -524,6 +522,8 @@ int getWindowSize(int* screen_rows, int* screen_cols) {
     // Getting window size thanks to ioctl into the given
     // winsize struct.
     /*
+    struct winsize ws;
+
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
         return -1;
     } else {

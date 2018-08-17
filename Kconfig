@@ -21,6 +21,6 @@ config MYAPPS_TTE_PRIORITY
 
 config MYAPPS_TTE_STACKSIZE
 	int "tte stack size"
-	default 2048
+	default 32768
 
 endif

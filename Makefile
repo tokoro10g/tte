@@ -13,7 +13,7 @@ ASRCS =
 CSRCS = contrib/getline/getline.c
 MAINSRC = tte.c
 
-CFLAGS+=-Icontrib/getline -DSIGWINCH=0 -DSIGCONT=0 -DSIGTSTP=0
+CFLAGS+=-Icontrib/getline -Wno-strict-prototypes -DSIGWINCH=0 -DSIGCONT=0 -DSIGTSTP=0
 
 CONFIG_MYAPPS_TTE_PROGNAME ?= tte$(EXEEXT)
 PROGNAME = $(CONFIG_MYAPPS_TTE_PROGNAME)
