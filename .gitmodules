@@ -1,0 +1,3 @@
+[submodule "contrib/getline"]
+	path = contrib/getline
+	url = git@github.com:ivanrad/getline.git
