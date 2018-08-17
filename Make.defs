@@ -1,0 +1,4 @@
+
+ifeq ($(CONFIG_MYAPPS_TTE),y)
+CONFIGURED_APPS += tte
+endif

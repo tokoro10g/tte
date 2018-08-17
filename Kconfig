@@ -1,0 +1,26 @@
+
+config MYAPPS_TTE
+	bool "TTE (tiny text editor)"
+	default n
+	---help---
+		Enable the tte app
+
+if MYAPPS_TTE
+
+config MYAPPS_TTE_PROGNAME
+	string "Program name"
+	default "tte"
+	depends on BUILD_KERNEL
+	---help---
+		This is the name of the program that will be use when the NSH ELF
+		program is installed.
+
+config MYAPPS_TTE_PRIORITY
+	int "tte task priority"
+	default 100
+
+config MYAPPS_TTE_STACKSIZE
+	int "tte stack size"
+	default 2048
+
+endif
