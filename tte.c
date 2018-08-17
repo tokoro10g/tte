@@ -41,6 +41,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <sdk/config.h>
+#include "getline.h"
+
 /*** Define section ***/
 
 // This mimics the Ctrl + whatever behavior, setting the
@@ -57,6 +60,9 @@
 // Highlight flags
 #define HL_HIGHLIGHT_NUMBERS (1 << 0)
 #define HL_HIGHLIGHT_STRINGS (1 << 1)
+
+#define STDIN_FILENO fileno(stdin)
+#define STDOUT_FILENO fileno(stdout)
 
 /*** Data section ***/
 
@@ -511,8 +517,13 @@ int editorReadKey() {
 int getWindowSize(int* screen_rows, int* screen_cols) {
     struct winsize ws;
 
+    // Fixed window size (VT100)
+    *screen_cols = 80;
+    *screen_rows = 24;
+
     // Getting window size thanks to ioctl into the given
     // winsize struct.
+    /*
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
         return -1;
     } else {
@@ -520,6 +531,8 @@ int getWindowSize(int* screen_rows, int* screen_cols) {
         *screen_rows = ws.ws_row;
         return 0;
     }
+    */
+    return 0;
 }
 
 void editorUpdateWindowSize() {
@@ -1101,21 +1114,24 @@ void editorSave() {
     int len;
     char* buf = editorRowsToString(&len);
 
+    // We don't have ftruncate functionality on NuttX; as a workaround, we
+    // open the file with O_TRUNC flag, and write the contents normally.
+
     // We want to create if it doesn't already exist (O_CREAT flag), giving
     // 0644 permissions (the standard ones). O_RDWR stands for reading and
     // writing.
-    int fd = open(ec.file_name, O_RDWR | O_CREAT, 0644);
+    int fd = open(ec.file_name, O_RDWR | O_CREAT | O_TRUNC, 0644);
     if (fd != -1) {
         // ftruncate sets the file's size to the specified length.
-        if (ftruncate(fd, len) != -1) {
-            // Writing the file.
-            if (write(fd, buf, len) == len) {
-                close(fd);
-                free(buf);
-                ec.dirty = 0;
-                editorSetStatusMessage("%d bytes written to disk", len);
-                return;
-            }
+        //if (ftruncate(fd, len) != -1) {
+        //    // Writing the file.
+        //}
+        if (write(fd, buf, len) == len) {
+            close(fd);
+            free(buf);
+            ec.dirty = 0;
+            editorSetStatusMessage("%d bytes written to disk", len);
+            return;
         }
         close(fd);
     }
@@ -1693,7 +1709,11 @@ int handleArgs(int argc, char* argv[]) {
     return 1;
 }
 
+#ifdef CONFIG_BUILD_KERNEL
 int main(int argc, char* argv[]) {
+#else
+int tte_main(int argc, char *argv[]) {
+#endif
     initEditor();
     int arg_response = handleArgs(argc, argv);
     if (arg_response == 1)
